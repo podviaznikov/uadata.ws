@@ -1,0 +1,38 @@
+Path: /cities/city
+
+
+    city
+        key - english name
+        localisation:{
+            en
+            ua
+            ru
+        }
+        zipCodes:[]
+        population:{
+            year,
+            people
+        },
+        cityStatus:"S","O","R"
+        region
+
+Example:
+
+/cities/Kyiv
+
+{
+    name:Kyiv,
+    localisation:{
+        en:"Kyiv"
+        ua:"Київ",
+        ru:"Киев"
+    },
+    zipCodes:[01001,01004,01008],
+    population:{
+        year:2001,
+        people:2611327
+    },
+    cityStatus:"R",
+    region:"Kyiv"
+}
+

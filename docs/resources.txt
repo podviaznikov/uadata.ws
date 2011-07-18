@@ -1,0 +1,6 @@
+cities
+    cities/city
+zipcodes
+    zipcodes/zipcode
+regions
+    regions/region
