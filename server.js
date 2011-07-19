@@ -1,20 +1,41 @@
-var db=require('riak-js').getClient(),
-    util=require('util');
-//db.getAll('cities');
-//db.save('cities', 'Kharkiv',{fleet: 111, country: 'NL'})
-//db.remove('cities','Kyiv');
-//db.save('cities', 'Дніпропетровськ',{})
+var express=require('express'),
+    querystring=require('querystring'),
+    app=express.createServer(),
+    httpProxy=require('http-proxy'),
+    db=require('riak-js').getClient();
 
-//db.save('cities','Kyiv',{
-//    ua:'Київ',
-//    population:{
-//        year:2001,
-//        people:2611327
-//    },
-//    cityStatus:'S'
-//},{
-//    encodeURI:true
-//});
-db.get('cities','Kyiv',function(err,city){
-    util.log(util.inspect(city));
+app.get('/cities',function(req,res){
+    var proxy=new httpProxy.HttpProxy(req,res),
+        params={
+            keys:true,
+            props:false
+        };
+    req.url='/riak/cities?'+querystring.stringify(params);
+    console.log(req.url);
+    proxy.proxyRequest(req, res,{port:8098,host:'127.0.0.1'});
 });
+app.get('/cities/:city',function(req,res){
+    var proxy=new httpProxy.HttpProxy(req,res);
+    req.url='/riak/cities/'+req.params.city;
+    console.log(req.url);
+    proxy.proxyRequest(req, res,{port:8098,host:'127.0.0.1'});
+});
+app.get('/ua/cities',function(req,res){
+    console.log("ua cities")
+   db.add('cities').map(function(v){
+       return [Riak.mapValuesJson(v)[0].localisation.ua];
+   }).run(function(err,cities){
+        if(err){
+            res.end();
+        }
+        else{
+            //console.log(cities)
+            res.contentType('application/json');
+            res.write(JSON.stringify(cities));
+            res.end();
+        }
+   });
+
+});
+app.listen(80);
+//http://drewwells.net/blog/188-nodejs-proxy-to-simplify-iws-api/

@@ -1,20 +1,23 @@
 var csv= require('csv'),
     transliteration=require('transliteration.ua'),
-    cities={},
-    db=require('riak-js').getClient();
+    db=require('riak-js').getClient(),
+    cloudmade=require('./geocoder.cloudmade'),
+    cities={};
+
+
 
 csv().fromPath('../data/zip/transformed.cities.zipcodes.csv')
     .on('data',function(data,index){
         var cityUaName=data[0],
             cityEnName=transliteration.ua.transliterate(cityUaName),
-            zipCodes=data.slice(2).map(function(zipCode){return parseInt(zipCode,10);}),
+            postcodes=data.slice(2).map(function(postcode){return parseInt(postcode,10);}),
             city={
                 key:cityEnName,
                 localisation:{
                     en:cityEnName,
                     ua:cityUaName
                 },
-                zipCodes:zipCodes,
+                postcodes:postcodes,
             };
         cities[cityEnName]=city;
     })
@@ -51,20 +54,31 @@ csv().fromPath('../data/zip/transformed.cities.zipcodes.csv')
                         region:region
                     };
                 }
-                cities[cityEnName]=city;
-                (function(city){
-                    var meta={
-                        encodeUri:true,
-                        links:[{bucket:'regions',key:region.key,tag:'city' }]
-                    };
 
-                    db.save('cities',cityEnName,city,meta
-                    ,function(er,data){
-                        if(er){
-                            console.log("Error for city",city);
-                        }
+                (function(city){
+                    cloudmade.findUaCityData(city.key,function(data){
+                        console.log("Geocoded "+city.key,data);
+
+                        city.localisation.de=data.localisation.de;
+                        city.localisation.ru=data.localisation.ru;
+                        city.localisation.pl=data.localisation.pl;
+                        city.geo=data.geo;
+                        cities[cityEnName]=city;
+                        var meta={
+                            encodeUri:true,
+                            links:[{bucket:'regions',key:region.key,tag:'city' }]
+                        };
+
+                        db.save('cities',cityEnName,city,meta
+                        ,function(er,data){
+                            if(er){
+                                console.log("Error for city",city);
+                            }
+                        });
+
                     });
                 })(city);
+
 
             })
             .on('end',function(count){

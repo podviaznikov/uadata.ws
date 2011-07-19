@@ -2,19 +2,31 @@ Path: /cities/city
 
 
     city
-        key - english name
+        key: english name
         localisation:{
             en
             ua
             ru
+            de
+            pl
         }
-        zipCodes:[]
+        postcodes:[]
         population:{
             year,
             people
         },
-        cityStatus:"S","O","R"
-        region
+        geo:{
+            latitude:
+            longitude:
+        },
+        region:{
+            key: english name
+            localisation:{
+                en
+                ua
+            }
+            link: absolute url
+        }
 
 Example:
 
@@ -25,14 +37,16 @@ Example:
     localisation:{
         en:"Kyiv"
         ua:"Київ",
-        ru:"Киев"
+        ru:"Киев",
+        de:"Kiew",
+        pl:"Kijów"
     },
-    zipCodes:[01001,01004,01008],
+    postcodes:[01001,01004,01008],
     population:{
         year:2001,
         people:2611327
     },
-    cityStatus:"R",
-    region:"Kyiv"
+    region:"region":{"key":"Kyiv","localisation":{"ua":"Київ","en":"Kyiv"},"link":"http://uadata.ws/regions/Kyiv"}
+    geo":{"latitude":50.44998,"longitude":30.5235}
 }
 
