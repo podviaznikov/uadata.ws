@@ -18,12 +18,13 @@ app.get('/cities/:city',function(req,res){
     var proxy=new httpProxy.HttpProxy(req,res);
     req.url='/riak/cities/'+req.params.city;
     console.log(req.url);
-    proxy.proxyRequest(req, res,{port:8098,host:'127.0.0.1'});
+    proxy.proxyRequest(req,res,{port:8098,host:'127.0.0.1'});
 });
 app.get('/ua/cities',function(req,res){
     console.log("ua cities")
    db.add('cities').map(function(v){
-       return [Riak.mapValuesJson(v)[0].localisation.ua];
+        var city=Riak.mapValuesJson(v)[0];
+        return [{key:city.key,ua:city.localisation.ua}];
    }).run(function(err,cities){
         if(err){
             res.end();
@@ -35,7 +36,6 @@ app.get('/ua/cities',function(req,res){
             res.end();
         }
    });
-
 });
 app.listen(80);
 //http://drewwells.net/blog/188-nodejs-proxy-to-simplify-iws-api/
