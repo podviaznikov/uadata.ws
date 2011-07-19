@@ -3,7 +3,6 @@ var csv= require('csv'),
     cities={},
     db=require('riak-js').getClient();
 
-
 csv().fromPath('../data/zip/transformed.cities.zipcodes.csv')
     .on('data',function(data,index){
         var cityUaName=data[0],
