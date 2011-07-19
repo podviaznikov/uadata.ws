@@ -22,10 +22,12 @@ app.get('/cities/:city',function(req,res){
 });
 app.get('/ua/cities',function(req,res){
     console.log("ua cities")
-   db.add('cities').map(function(v){
-        var city=Riak.mapValuesJson(v)[0];
-        return [{key:city.key,ua:city.localisation.ua}];
-   }).run(function(err,cities){
+    db.add('cities').map(function(v){
+        var city=Riak.mapValuesJson(v)[0],
+            record={};
+        record[city.key]=city.localisation.ua;
+        return [record];
+    }).run(function(err,cities){
         if(err){
             res.end();
         }
@@ -35,7 +37,36 @@ app.get('/ua/cities',function(req,res){
             res.write(JSON.stringify(cities));
             res.end();
         }
-   });
+    });
+});
+app.get('/ua/regions/cities',function(req,res){
+    console.log("ua regional capitals")
+    db.add('cities').map(function(v){
+        var city=Riak.mapValuesJson(v)[0],
+            record={};
+        if(city.regionCapital===true){
+            record[city.key]=city.localisation.ua;
+            return [record];
+        }
+        else{
+            return [];
+        }
+    })
+    .reduce(function(values){
+        values.sort(function(a,b));
+        return values;
+    })
+    .run(function(err,cities){
+        if(err){
+            res.end();
+        }
+        else{
+            //console.log(cities)
+            res.contentType('application/json');
+            res.write(JSON.stringify(cities));
+            res.end();
+        }
+    });
 });
 app.listen(80);
 //http://drewwells.net/blog/188-nodejs-proxy-to-simplify-iws-api/

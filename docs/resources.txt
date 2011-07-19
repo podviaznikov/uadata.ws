@@ -1,6 +1,8 @@
 cities
-    cities/city
-zipcodes
-    zipcodes/zipcode
+    cities/city - city details
+    ua/cities - list
+    en/cities -list
+postcodes
+    postcodes/postcode
 regions
     regions/region

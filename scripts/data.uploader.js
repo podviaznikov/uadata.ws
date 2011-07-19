@@ -18,6 +18,7 @@ csv().fromPath('../data/zip/transformed.cities.zipcodes.csv')
                     ua:cityUaName
                 },
                 postcodes:postcodes,
+                regionCapital:true
             };
         cities[cityEnName]=city;
     })
